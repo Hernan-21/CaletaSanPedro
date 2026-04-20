@@ -42,21 +42,17 @@ a {
 .neon-text-orange {
   color: #fff;
   text-shadow: 
-    0 0 5px #fff,
-    0 0 10px #fff,
-    0 0 20px var(--neon-orange),
-    0 0 40px var(--neon-orange),
-    0 0 80px var(--neon-orange);
+    0 0 2px #fff,
+    0 0 5px var(--neon-orange),
+    0 0 10px var(--neon-orange);
 }
 
 .neon-text-blue {
   color: #fff;
   text-shadow: 
-    0 0 5px #fff,
-    0 0 10px #fff,
-    0 0 20px var(--neon-blue),
-    0 0 40px var(--neon-blue),
-    0 0 80px var(--neon-blue);
+    0 0 2px #fff,
+    0 0 5px var(--neon-blue),
+    0 0 10px var(--neon-blue);
 }
 
 .btn-primary {

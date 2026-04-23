@@ -1,11 +1,21 @@
 'use client';
 import { useState } from 'react';
-import { CreditCard, Calendar, Clock, MapPin, Users, Fish, CheckCircle } from 'lucide-react';
+import { CreditCard, Calendar, Clock, MapPin, Users, Fish, CheckCircle, ShoppingCart, Plus, Trash2, X } from 'lucide-react';
 
 export default function Home() {
   const [reservation, setReservation] = useState({ name: '', date: '', time: '', pax: '2' });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('idle'); // idle | processing | success
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const addToCart = (item) => setCart([...cart, item]);
+  const removeFromCart = (index) => {
+    const newCart = [...cart];
+    newCart.splice(index, 1);
+    setCart(newCart);
+  };
+  const cartTotal = cart.reduce((total, item) => total + parseFloat(item.price.replace(/[^\d.]/g, '')), 0);
 
   const menuCategories = [
     {
@@ -87,9 +97,20 @@ Personas: ${reservation.pax}`;
       {/* Navbar Minimal */}
       <nav style={{ padding: '20px 40px', background: 'rgba(5, 10, 20, 0.8)', backdropFilter: 'blur(10px)', position: 'fixed', top: 0, width: '100%', zIndex: 100, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <h2 className="neon-text-blue" style={{ fontSize: '1.5rem', margin: 0, display:'flex', alignItems:'center', gap:'10px' }}><Fish size={24}/> Caleta San Pedro</h2>
-        <div style={{ display: 'flex', gap: '20px' }}>
-          <a href="#menu" style={{ color: 'var(--text-light)' }}>Menú</a>
-          <a href="#reservas" style={{ color: 'var(--text-light)' }}>Reserva VIP</a>
+        <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+          <a href="#menu" style={{ color: 'var(--text-light)', fontWeight: 'bold' }}>Menú</a>
+          <a href="#reservas" style={{ color: 'var(--text-light)', fontWeight: 'bold' }}>Reservar</a>
+          <button 
+            onClick={() => setIsCartOpen(true)}
+            style={{ position: 'relative', background: 'none', border: 'none', color: 'var(--neon-orange)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          >
+            <ShoppingCart size={26} />
+            {cart.length > 0 && (
+              <span style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#eab308', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                {cart.length}
+              </span>
+            )}
+          </button>
         </div>
       </nav>
 
@@ -110,7 +131,6 @@ Personas: ${reservation.pax}`;
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px', alignItems: 'stretch' }}>
             {menuCategories.map((cat, i) => (
               <div key={i} className="glass-panel" style={{ background: 'rgba(13, 33, 73, 0.4)', padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                {cat.img && <img src={cat.img} alt={cat.title} style={{ width: '100%', height: '220px', objectFit: 'cover' }} />}
                 <div style={{ padding: '24px', flexGrow: 1 }}>
                   <h3 className="neon-text-orange" style={{ fontSize: '1.4rem', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>{cat.title}</h3>
                   {cat.items.map((item, j) => (
@@ -119,7 +139,15 @@ Personas: ${reservation.pax}`;
                         <h4 style={{ fontSize: '1.05rem', color: 'var(--text-light)', marginBottom: '4px' }}>{item.name}</h4>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>{item.desc}</p>
                       </div>
-                      <div style={{ fontWeight: 'bold', color: 'var(--neon-blue)', whiteSpace: 'nowrap' }}>{item.price}€</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                        <span style={{ fontWeight: 'bold', color: 'var(--neon-blue)', whiteSpace: 'nowrap' }}>{item.price}€</span>
+                        <button 
+                          onClick={() => addToCart(item)}
+                          style={{ background: 'var(--neon-orange)', border: 'none', borderRadius: '4px', padding: '4px 8px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}
+                        >
+                          <Plus size={14}/> Agregar
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -209,6 +237,59 @@ Personas: ${reservation.pax}`;
           <p>© 2026 Caleta San Pedro. Mockup Design Demo.</p>
         </div>
       </footer>
+
+      {/* Cart Sidebar */}
+      {isCartOpen && (
+        <div style={{
+          position: 'fixed', top: 0, right: 0, bottom: 0, width: '100%', maxWidth: '400px', 
+          background: 'var(--bg-dark)', zIndex: 1000,
+          borderLeft: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column',
+          boxShadow: '-10px 0 30px rgba(0,0,0,0.5)'
+        }}>
+          <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 className="neon-text-blue" style={{ fontSize: '1.5rem', display:'flex', alignItems:'center', gap:'10px' }}>
+              <ShoppingCart size={24}/> Tu Pedido
+            </h3>
+            <button onClick={() => setIsCartOpen(false)} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}><X size={24}/></button>
+          </div>
+          
+          <div style={{ padding: '20px', flexGrow: 1, overflowY: 'auto' }}>
+            {cart.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', textAlign: 'center', marginTop: '40px' }}>Tu carrito está vacío.</p>
+            ) : (
+              cart.map((item, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
+                  <div>
+                    <h4 style={{ fontSize: '0.95rem', color: 'var(--text-light)' }}>{item.name}</h4>
+                    <span style={{ color: 'var(--neon-blue)', fontWeight: 'bold', fontSize: '0.9rem' }}>{item.price}€</span>
+                  </div>
+                  <button onClick={() => removeFromCart(i)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                    <Trash2 size={18}/>
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+          
+          {cart.length > 0 && (
+            <div style={{ padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-light)' }}>
+                <span>Subtotal:</span>
+                <span style={{ color: 'var(--neon-orange)' }}>{cartTotal.toFixed(2)}€</span>
+              </div>
+              <button 
+                onClick={() => { setIsCartOpen(false); setShowPaymentModal(true); }}
+                className="btn-primary" style={{ width: '100%', fontSize: '1.2rem', display: 'flex', justifyContent: 'center', alignItems:'center', gap: '10px' }}
+              >
+                <CreditCard size={20}/> Procesar Pedido
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Cart Sidebar Overlay Context */}
+      {isCartOpen && <div onClick={() => setIsCartOpen(false)} style={{ position:'fixed', top:0, left:0, bottom:0, right:0, background:'rgba(0,0,0,0.6)', zIndex:999, backdropFilter: 'blur(3px)' }}></div>}
 
       {/* Payment Modal Mockup */}
       {showPaymentModal && (
